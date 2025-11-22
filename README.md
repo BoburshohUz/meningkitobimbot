@@ -1,1 +1,0 @@
-Full Telegram file-upload bot. Deploy on Railway.
