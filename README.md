@@ -1,0 +1,1 @@
+Deploy this to Railway and set BOT_TOKEN in Environment Variables.
