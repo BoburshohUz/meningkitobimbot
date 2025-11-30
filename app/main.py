@@ -11,7 +11,7 @@ qr_scan_total = Counter("qr_scan_total", "QR skanlar soni")
 
 app = FastAPI(title="Mening Kitobim Bot")
 
-class PrometheusMiddleware(BaseHttpMiddleware):
+class PrometheusMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
         if request.method == "POST" and request.url.path == "/webhook":
@@ -37,4 +37,4 @@ async def telegram_webhook(request: Request):
 
 @app.get("/")
 async def root():
-    return {"status":"ok"}
+    return {"status": "ok", "service": "kitob-bot alive"}
