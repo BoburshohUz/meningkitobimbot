@@ -7,3 +7,4 @@
 - QR scanner endpoint (`POST /api/scan_qr`) using Pillow + pyzbar
 
 **Note:** `pyzbar` may require system library `zbar` to be installed in the Docker image or host system. Update Dockerfile accordingly.
+trigger deploy
