@@ -1,0 +1,12 @@
+{
+  "contactPoints": [
+    {
+      "name": "Telegram Kitob Bot Alerts",
+      "type": "telegram",
+      "settings": {
+        "bottoken": ""
+      },
+      "disableResolveMessage": false
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Kitob Bot Monitoring",
+    "tags": [
+      "telegram",
+      "fastapi",
+      "books",
+      "monitoring"
+    ],
+    "timezone": "browser",
+    "schemaVersion": 37,
+    "panels": [
+      {
+        "type": "stat",
+        "title": "Jami HTTP so‘rovlar",
+        "targets": [
+          {
+            "expr": "http_requests_total"
+          }
+        ],
+        "gridPos": {
+          "x": 0,
+          "y": 0,
+          "w": 6,
+          "h": 4
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Request latency",
+        "targets": [
+          {
+            "expr": "http_request_latency_seconds_bucket"
+          }
+        ],
+        "gridPos": {
+          "x": 6,
+          "y": 0,
+          "w": 12,
+          "h": 6
+        }
+      },
+      {
+        "type": "stat",
+        "title": "Rezervlar soni",
+        "targets": [
+          {
+            "expr": "reservations_total"
+          }
+        ],
+        "gridPos": {
+          "x": 0,
+          "y": 4,
+          "w": 6,
+          "h": 4
+        }
+      },
+      {
+        "type": "stat",
+        "title": "QR scanlar chaqiruvi",
+        "targets": [
+          {
+            "expr": "qr_scan_total"
+          }
+        ],
+        "gridPos": {
+          "x": 0,
+          "y": 8,
+          "w": 6,
+          "h": 4
+        }
+      },
+      {
+        "type": "stat",
+        "title": "Recommend requests",
+        "targets": [
+          {
+            "expr": "recommend_requests_total"
+          }
+        ],
+        "gridPos": {
+          "x": 18,
+          "y": 0,
+          "w": 6,
+          "h": 4
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Books search (by query label)",
+        "targets": [
+          {
+            "expr": "books_search_total"
+          }
+        ],
+        "gridPos": {
+          "x": 18,
+          "y": 4,
+          "w": 12,
+          "h": 6
+        }
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "service",
+          "type": "label_values",
+          "label": "service",
+          "datasource": "Prometheus",
+          "query": "http_requests_total",
+          "refresh": 1
+        },
+        {
+          "name": "endpoint",
+          "type": "label_values",
+          "label": "endpoint",
+          "datasource": "Prometheus",
+          "query": "http_requests_total",
+          "refresh": 1
+        },
+        {
+          "name": "user",
+          "type": "label_values",
+          "label": "user",
+          "datasource": "Prometheus",
+          "query": "http_requests_total",
+          "refresh": 1
+        }
+      ]
+    }
+  }
+}
