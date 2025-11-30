@@ -4,3 +4,4 @@ docker-compose.yml
 *.db
 pycache/
 data/
+DS_Store
