@@ -1,49 +1,48 @@
-from prometheus_client import Counter
-reservations_total = Counter("reservations_total","Total reservations")
-qr_scan_total = Counter("qr_scan_total","QR scan total")
-
 from fastapi import FastAPI, Request
-from starlette.middleware.cors import CORSMiddleware
-from .settings import settings
-from .middleware.ip_allowlist import IPAllowlistMiddleware
-from .logging_config import configure_logging
+import logging
+from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
+from starlette.middleware.base import BaseHTTPMiddleware
 
-configure_logging()
-app = FastAPI(title="MeningKitobimBot")
+# Log sozlash
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("kitob-bot")
 
-# Qo‘shilgan Monitoring + Rate limit + QR
-from .monitoring import PrometheusMiddleware, metrics_endpoint
-from .middleware.rate_limit import RateLimitMiddleware
-from .qr import router as qr_router
+# Monitoring metricalar
+reservations_total = Counter("reservations_total", "Jami kitob rezervlari")
+qr_scan_total = Counter("qr_scan_total", "QR skanlar soni")
 
-app.add_middleware(RateLimitMiddleware)
+# FastAPI ilovasi
+app = FastAPI(title="Mening Kitobim Bot")
+
+# Prometheus middleware
+class PrometheusMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        if request.method == "POST" and request.url.path == "/webhook":
+            qr_scan_total.inc()
+        return response
+
 app.add_middleware(PrometheusMiddleware)
-app.include_router(qr_router, prefix="/api")
-app.add_route("/metrics", metrics_endpoint)
 
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"]
-)
+# Metrics endpoint
+@app.get("/metrics")
+async def metrics():
+    data = generate_latest()
+    return Response(content=data, media_type=CONTENT_TYPE_LATEST)
 
-# IP allowlist
-if settings.IP_ALLOWLIST:
-    app.add_middleware(IPAllowlistMiddleware)
-
+# Telegram webhook endpoint
 @app.post("/webhook")
-async def webhook(request: Request):
-    data = await request.json()
-    qr_scan_total.inc()
-    return {"ok":True, "size": len(str(data))}
+async def telegram_webhook(request: Request):
+    try:
+        body = await request.json()
+        logger.info(f"Webhook data keldi, size={len(str(body))}")
+        reservations_total.inc()
+        return {"ok": True, "message": "Webhook qabul qilindi ✅"}
+    except Exception as e:
+        logger.error(f"Webhook error: {e}")
+        return {"ok": False, "error": str(e)}
 
+# Root test
 @app.get("/")
 async def root():
-    return {"status":"ok","service":"kitob-bot"}
-
-from .recommend import router as recommend_router
-app.include_router(recommend_router, prefix='/api')
-
-# Prometheus metrics mounted at /metrics
+    return {"status": "ok", "service": "kitob-bot", "message": "Server ishga tushdi ✅"}
